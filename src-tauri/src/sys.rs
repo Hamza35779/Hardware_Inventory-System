@@ -1,5 +1,5 @@
 use serde::Serialize;
-use sysinfo::{System, Pid};
+use sysinfo::System;
 
 #[derive(Debug, Serialize)]
 pub struct SystemMetrics {

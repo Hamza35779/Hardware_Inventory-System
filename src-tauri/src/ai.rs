@@ -1,7 +1,6 @@
 use serde::{Serialize, Deserialize};
 use std::path::PathBuf;
-use candle_core::{Device, Tensor};
-use candle_transformers::generation::LogitsProcessor;
+use candle_core::Device;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChatMessage {
@@ -14,7 +13,7 @@ pub fn execute_ai_query(
     prompt: &str,
     products_json: &str,
     contacts_json: &str,
-    transactions_json: &str,
+    _transactions_json: &str,
     app_data_dir: PathBuf,
 ) -> String {
     let lower_prompt = prompt.to_lowercase();
@@ -116,7 +115,7 @@ pub fn execute_ai_query(
 fn run_candle_gguf(model_path: &std::path::Path, prompt: &str) -> candle_core::Result<String> {
     // Basic setup for Candle. 
     // We will initialize a CPU device, read GGUF tensor headers, and generate a response.
-    let device = Device::Cpu;
+    let _device = Device::Cpu;
     let mut file = std::fs::File::open(model_path)?;
     
     // Standard Candle GGUF file loader

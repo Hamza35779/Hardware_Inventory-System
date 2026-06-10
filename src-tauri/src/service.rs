@@ -18,7 +18,7 @@ pub fn my_service_main(_arguments: Vec<std::ffi::OsString>) {
     let event_handler = move |control_event| -> ServiceControlHandlerResult {
         match control_event {
             ServiceControl::Stop => ServiceControlHandlerResult::NoError,
-            _ => ServiceControlHandlerResult::NotSupported,
+            _ => ServiceControlHandlerResult::NotImplemented,
         };
         ServiceControlHandlerResult::NoError
     };
@@ -31,6 +31,7 @@ pub fn my_service_main(_arguments: Vec<std::ffi::OsString>) {
             exit_code: ServiceExitCode::Win32(0),
             checkpoint: 0,
             wait_hint: Duration::from_secs(0),
+            process_id: None,
         };
         status_handle.set_service_status(next_status).ok();
         

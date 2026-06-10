@@ -1,7 +1,6 @@
-use serde::{Serialize, Deserialize};
 use std::sync::Mutex;
 use std::path::PathBuf;
-use tauri::{AppHandle, Manager, State};
+use tauri::{Manager, State};
 
 mod db;
 mod sys;

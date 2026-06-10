@@ -273,40 +273,33 @@ impl DbManager {
     // Khata Transactions methods
     pub fn get_transactions(&self, contact_id: Option<i64>) -> Result<Vec<Transaction>> {
         let conn = self.get_conn()?;
-        let query = match contact_id {
-            Some(_) => "SELECT id, contact_id, amount, flow_type, description, timestamp FROM khata_transactions WHERE contact_id = ? ORDER BY timestamp DESC",
-            None => "SELECT id, contact_id, amount, flow_type, description, timestamp FROM khata_transactions ORDER BY timestamp DESC",
-        };
-        let mut stmt = conn.prepare(query)?;
+        let mut transactions = Vec::new();
         
-        let tx_iter = if let Some(cid) = contact_id {
-            stmt.query_map([cid], |row| {
-                Ok(Transaction {
-                    id: Some(row.get(0)?),
-                    contact_id: row.get(1)?,
-                    amount: row.get(2)?,
-                    flow_type: row.get(3)?,
-                    description: row.get(4)?,
-                    timestamp: row.get(5)?,
-                })
-            })?
-        } else {
-            stmt.query_map([], |row| {
-                Ok(Transaction {
-                    id: Some(row.get(0)?),
-                    contact_id: row.get(1)?,
-                    amount: row.get(2)?,
-                    flow_type: row.get(3)?,
-                    description: row.get(4)?,
-                    timestamp: row.get(5)?,
-                })
-            })?
+        let row_mapper = |row: &rusqlite::Row| {
+            Ok(Transaction {
+                id: Some(row.get(0)?),
+                contact_id: row.get(1)?,
+                amount: row.get(2)?,
+                flow_type: row.get(3)?,
+                description: row.get(4)?,
+                timestamp: row.get(5)?,
+            })
         };
 
-        let mut transactions = Vec::new();
-        for tx in tx_iter {
-            transactions.push(tx?);
+        if let Some(cid) = contact_id {
+            let mut stmt = conn.prepare("SELECT id, contact_id, amount, flow_type, description, timestamp FROM khata_transactions WHERE contact_id = ? ORDER BY timestamp DESC")?;
+            let tx_iter = stmt.query_map([cid], row_mapper)?;
+            for tx in tx_iter {
+                transactions.push(tx?);
+            }
+        } else {
+            let mut stmt = conn.prepare("SELECT id, contact_id, amount, flow_type, description, timestamp FROM khata_transactions ORDER BY timestamp DESC")?;
+            let tx_iter = stmt.query_map([], row_mapper)?;
+            for tx in tx_iter {
+                transactions.push(tx?);
+            }
         }
+        
         Ok(transactions)
     }
 
